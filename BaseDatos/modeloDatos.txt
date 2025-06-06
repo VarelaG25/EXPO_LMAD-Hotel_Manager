@@ -1,0 +1,217 @@
+﻿-- Keyspace
+CREATE KEYSPACE IF NOT EXISTS "HotelDataBase"
+WITH replication = {
+	'class' : 'SimpleStrategy',
+	'replication_factor' : 1
+};
+-- Tablas
+CREATE TABLE IF NOT EXISTS login_usuarios (
+	correoUsuario text PRIMARY KEY,
+    contraseniaaUsuario text,
+    tipoUsuario int
+);
+CREATE TABLE IF NOT EXISTS cliente (
+    Id_Cliente uuid,
+    Nombre text,
+    PrimerApellido text,
+    SegundoApellido text,
+    FechaNacimientoCliente timestamp,
+    TelefonoCasa map<int, text>,
+    TelefonoCelular map<int, text>,
+    EstadoCivil text,
+    RFC text,
+    Correo set<text>,                          
+    FechaRegistro timestamp,
+    FechaModificacion timestamp,
+    Id_Ubicacion uuid,
+    Ciudad text,
+    Estado text,
+    Pais text,
+    CodigoPostal int,
+    PRIMARY KEY (Id_Cliente)
+);
+CREATE TABLE IF NOT EXISTS usuarios (
+    Id_Usuario uuid,
+    Id_Admin boolean,
+    NumeroNomina int,
+    NombreUsuario text,
+    PrimerApellido text,
+    SegundoApellido text,
+    TelefonoCelular text,
+    TelefonoCasa text,
+    CorreoUsuario text,
+    ContrasenaUsuario text,
+    FechaRegistroUsuario timestamp,
+    FechaModificacionUsuario timestamp,
+    PRIMARY KEY (NumeroNomina)
+);
+CREATE TABLE IF NOT EXISTS hoteles (
+    id_hotel uuid PRIMARY KEY,
+    id_usuario uuid,
+    nombre_hotel text,
+    pais text,
+    estado text,
+    ciudad text,
+    domicilio text,
+    zona_turistica text,
+    num_pisos int,
+    fecha_operacion timestamp,
+    frente_playa int,
+    num_piscinas int,
+    salon_eventos int,
+    num_habitaciones int,
+    fecha_registro timestamp,
+    fecha_modificacion timestamp
+);
+CREATE TABLE IF NOT EXISTS hoteles_resumen (
+    id_hotel uuid PRIMARY KEY,
+    nombre_hotel text,
+    pais text,
+    estado text,
+    ciudad text
+);
+CREATE TABLE IF NOT EXISTS habitaciones_por_hotel (
+    id_hotel int,
+    id_habitacion int,
+    tipo_habitacion text,
+    descripcion text,
+    precio decimal,
+    capacidad int,
+    PRIMARY KEY (id_hotel, id_habitacion)
+);
+CREATE TABLE IF NOT EXISTS servicios_adicionales (
+    id_hotel uuid,
+    id_servicio uuid,
+    nombre_servicio text,
+    costo decimal,
+    PRIMARY KEY (id_hotel, id_servicio)
+);
+CREATE TABLE IF NOT EXISTS tipoHabitacion (
+    IdTipoHab uuid PRIMARY KEY,
+    IdHotel uuid,
+    nombreHotel text,
+    nivelHabitacion text,
+    numeroCamas int,
+    tipoCama text,
+    precio decimal,
+    numeroPersonas int,
+    frenteA boolean,
+    caracteristicas text,
+    amenidades text,
+    estatus int
+);
+CREATE TABLE IF NOT EXISTS distribucion_habitaciones (
+    id_hotel uuid,
+    id_tipo_hab uuid,
+    nombre_tipo text,
+    cantidad int,
+    PRIMARY KEY (id_hotel, id_tipo_hab)
+);
+CREATE TABLE IF NOT EXISTS reservaciones (
+    id_reservacion uuid,
+    id_usuario uuid,
+    id_hotel uuid,
+    id_tipohab uuid,
+    nombre_hotel text,
+    id_cliente uuid,
+    apellidos text,
+    rfc text,
+    correo text,
+    codigo_reserva uuid,
+    fecha_llegada timestamp,
+    fecha_salida timestamp,
+    total decimal,
+    total_servicios decimal,
+    anticipo decimal,
+    restante decimal,
+    metodo_pago text,
+    personas_hospedadas int,
+    estatus text,
+    fecha_checkin timestamp,
+    fecha_checkout timestamp,
+    checkin boolean,
+    checkout boolean,
+    fecha_registro timestamp,
+    PRIMARY KEY (id_reservacion)
+);
+CREATE TABLE IF NOT EXISTS resumen_reservacion (
+    id_cliente uuid,
+    rfc text,
+    metodo_pago text,
+    total_servicios decimal,
+    subtotal decimal,
+    iva decimal,
+    total decimal,
+    anticipo decimal,
+    pendiente decimal,
+    PRIMARY KEY (id_cliente)
+);
+CREATE TABLE IF NOT EXISTS reservacionCheckIn (
+   	id_reservacion uuid,
+    id_cliente uuid,
+    apellidos text,
+    rfc text,
+    correo text,
+    codigo_reserva uuid,
+    estatus text,
+    fecha_checkin timestamp,
+    fecha_registro timestamp,
+    PRIMARY KEY (codigo_reserva)
+);
+CREATE TABLE IF NOT EXISTS reservacionCheckOut (
+   	id_reservacion uuid,
+    id_cliente uuid,
+    apellidos text,
+    rfc text,
+    correo text,
+    codigo_reserva uuid,
+    estatus text,
+    fecha_checkout timestamp,
+    fecha_registro timestamp,
+    PRIMARY KEY (codigo_reserva)
+);
+CREATE TABLE IF NOT EXISTS cancelaciones (
+    codigo_reserva uuid PRIMARY KEY,
+    id_reservacion uuid,
+    id_cliente uuid,
+    apellidos text,
+    rfc text,
+    correo text,
+    fecha_cancelacion timestamp
+);
+-- Dato de inicio
+INSERT INTO login_usuarios (correoUsuario, contraseniaaUsuario, tipoUsuario)
+VALUES ('juan@example.com', '1234', 1);
+select * from usuarios;
+INSERT INTO usuarios (
+    Id_Usuario,
+    Id_Admin,
+    NumeroNomina,
+    NombreUsuario,
+    PrimerApellido,
+    SegundoApellido,
+    TelefonoCelular,
+    TelefonoCasa,
+    CorreoUsuario,
+    ContrasenaUsuario,
+    FechaRegistroUsuario,
+    FechaModificacionUsuario
+) VALUES (
+    uuid(),                      
+    true,                        
+    1001,                        
+    'Juan',
+    'Perez',
+    'Lopez',
+    '5512345678',
+    '5554321098',
+    'juan@example.com',
+    '123456',
+    toTimestamp(now()),         
+    toTimestamp(now())          
+);
+-- Indices
+SELECT * FROM system_schema.indexes WHERE keyspace_name = 'HotelDataBase';
+CREATE INDEX IF NOT EXISTS idx_correo_usuario ON usuarios (CorreoUsuario);
+CREATE INDEX IF NOT EXISTS idx_checkin ON reservaciones (checkin);
+CREATE INDEX IF NOT EXISTS idx_checkout ON reservaciones (checkout);

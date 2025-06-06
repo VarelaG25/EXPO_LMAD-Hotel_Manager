@@ -249,6 +249,8 @@
   <ItemGroup>
     <None Include="Resources\Logis.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="BaseDatos\modeloDatos.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
