@@ -34,11 +34,8 @@ namespace AAVD
 
         private void Login_Continuar_Click(object sender, EventArgs e)
         {
-            //string usuario = Login_Usuario.Text.Trim();
-            //string contrasena = Login_Contrasena.Text.Trim();
-
-            string usuario = "juan@example.com";
-            string contrasena = "1234";
+            string usuario = Login_Usuario.Text.Trim();
+            string contrasena = Login_Contrasena.Text.Trim();
 
             if (string.IsNullOrWhiteSpace(usuario) || string.IsNullOrWhiteSpace(contrasena))
             {
